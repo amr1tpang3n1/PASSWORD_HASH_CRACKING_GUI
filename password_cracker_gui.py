@@ -54,9 +54,12 @@ class Password_Cracker:
         self.minInput = StringVar()
         entry_box1 = Entry(self.BruteForce, font="cambria 15", width="10", textvariable=self.minInput)
         entry_box1.place(x=195, y=120)
+        self.minInput.trace_variable("w",self.inputValidationMin)
 
-        entry_box1 = Entry(self.BruteForce, font="cambria 15", width="10", textvariable=self.minInput)
+        self.maxInput = StringVar()
+        entry_box1 = Entry(self.BruteForce, font="cambria 15", width="10", textvariable=self.maxInput)
         entry_box1.place(x=485, y=120)
+        self.maxInput.trace_variable("w",self.inputValidationMax)
 
         style_ = ttk.Style()
         style_.configure('my.TButton',font="cambria 14")
@@ -64,17 +67,35 @@ class Password_Cracker:
         self.buttonBrute = ttk.Button(self.BruteForce, text="Start Attack",style = 'my.TButton')
         self.buttonBrute.place(x=330, y=180)
 
-        self.Result_Progress_Label = Label(self.BruteForce, text = "" , width = 105, height = 12 , bg = "white")
-        self.Result_Progress_Label.place(x=30,y = 220)
+        self.Result_Progress_Text = Label(self.BruteForce, width = 105, height = 12 , bg = "white", state = "disabled")
+        self.Result_Progress_Text.place(x=30,y = 220)
 
         self.Brute_PW_Found = Label(self.BruteForce,text=f"Cracked Password Will be Displayed Here", bg = "#abcdef", font="Cambria 14")
         self.Brute_PW_Found.place(x=30,y=420)
-
-
 
         self.root.mainloop()
 
     def bruteForceAttack(self):
         pass
 
+    def inputValidationMin(self,*args):
+        try:
+            a = str(self.minInput.get())
+            int(self.minInput.get())
+        except Exception:
+            a = str(self.minInput.get())
+            if a != "":
+                self.minInput.set(a[:-1])
+
+    def inputValidationMax(self,*args):
+        try:
+            a = str(self.maxInput.get())
+            int(self.maxInput.get())
+        except Exception:
+            a = str(self.maxInput.get())
+            if a != "":
+                self.maxInput.set(a[:-1])
+
+
 Password_Cracker()
+
