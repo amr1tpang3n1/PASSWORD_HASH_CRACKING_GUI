@@ -64,7 +64,13 @@ class Password_Cracker:
         self.buttonBrute = ttk.Button(self.BruteForce, text="Start Attack",style = 'my.TButton')
         self.buttonBrute.place(x=330, y=180)
 
-        self.Result_Label = Label(self.BruteForce)
+        self.Result_Progress_Label = Label(self.BruteForce, text = "" , width = 105, height = 12 , bg = "white")
+        self.Result_Progress_Label.place(x=30,y = 220)
+
+        self.Brute_PW_Found = Label(self.BruteForce,text=f"Cracked Password Will be Displayed Here", bg = "#abcdef", font="Cambria 14")
+        self.Brute_PW_Found.place(x=30,y=420)
+
+
 
         self.root.mainloop()
 
