@@ -1,7 +1,7 @@
-# Amrit Pangeni
 from tkinter import ttk
 from tkinter import *
-
+import itertools
+import hashlib
 
 class Password_Cracker:
     def __init__(self):
@@ -31,54 +31,66 @@ class Password_Cracker:
                           text="                                   Rainbow Table Attack                                       ")
 
         # Brute Force Attack GUI
-        label1 = Label(self.BruteForce, text="Hash Type & Password Hash to Crack :", bg="#abcdef",
-                       font="cambria 14")
-        label1.place(x=30,y=15)
+        labelCharset = Label(self.BruteForce, text="Charset :", bg="#abcdef",
+                             font="cambria 14")
+        labelCharset.place(x=30, y=10)
 
-        self.hashInput = StringVar()
-        hash_entry = Entry(self.BruteForce, font="cambria 12", width="81", textvariable=self.hashInput)
-        hash_entry.place(x=30, y=80)
+        self.Charset = StringVar()
+        EntryCharset = Entry(self.BruteForce, font="cambria 15", width="31", textvariable=self.Charset)
+        EntryCharset.place(x=115, y=10)
+        self.Charset.set("abcdefghijklmnopqrstuvwxyz")
+
+        labelHashT = Label(self.BruteForce, text="Algorithm Type :", bg="#abcdef",
+                           font="cambria 14")
+        labelHashT.place(x=470, y=10)
 
         self.comboBox = ttk.Combobox(self.BruteForce, values=("Sha1", "Sha2", "Md5"), state='readonly')
         self.comboBox.set("Md5")
-        self.comboBox.place(x=30, y=50)
+        self.comboBox.place(x=620, y=15)
+
+        label1 = Label(self.BruteForce, text="Password Hash to Crack :", bg="#abcdef",
+                       font="cambria 14")
+        label1.place(x=30, y=50)
+
+        self.hashInput = StringVar()
+        hash_entry = Entry(self.BruteForce, font="cambria 12", width="81", textvariable=self.hashInput)
+        hash_entry.place(x=30, y=85)
+        hash_entry.focus()
 
         label2 = Label(self.BruteForce, text="Minimum Length :", bg="#abcdef",
                        font="cambria 14")
-        label2.place(x=30,y=120)
+        label2.place(x=30, y=120)
 
         label3 = Label(self.BruteForce, text="Minimum Length :", bg="#abcdef",
                        font="cambria 14")
-        label3.place(x=320,y=120)
+        label3.place(x=320, y=120)
 
         self.minInput = StringVar()
         entry_box1 = Entry(self.BruteForce, font="cambria 15", width="10", textvariable=self.minInput)
         entry_box1.place(x=195, y=120)
-        self.minInput.trace_variable("w",self.inputValidationMin)
+        self.minInput.trace_variable("w", self.inputValidationMin)
 
         self.maxInput = StringVar()
         entry_box1 = Entry(self.BruteForce, font="cambria 15", width="10", textvariable=self.maxInput)
         entry_box1.place(x=485, y=120)
-        self.maxInput.trace_variable("w",self.inputValidationMax)
+        self.maxInput.trace_variable("w", self.inputValidationMax)
 
         style_ = ttk.Style()
-        style_.configure('my.TButton',font="cambria 14")
+        style_.configure('my.TButton', font="cambria 14")
 
-        self.buttonBrute = ttk.Button(self.BruteForce, text="Start Attack",style = 'my.TButton')
-        self.buttonBrute.place(x=330, y=180)
+        self.buttonBrute = ttk.Button(self.BruteForce, text="Start Attack", style='my.TButton',
+                                      command=self.validation_algo)
+        self.buttonBrute.place(x=330, y=175)
 
-        self.Result_Progress_Text = Label(self.BruteForce, width = 105, height = 12 , bg = "white", state = "disabled")
-        self.Result_Progress_Text.place(x=30,y = 220)
+        self.Result_Progress_Text = Text(self.BruteForce, width=92, height=12, bg="white")
+        self.Result_Progress_Text.place(x=30, y=220)
 
-        self.Brute_PW_Found = Label(self.BruteForce,text=f"Cracked Password Will be Displayed Here", bg = "#abcdef", font="Cambria 14")
-        self.Brute_PW_Found.place(x=30,y=420)
+        self.Brute_PW_Found = Label(self.BruteForce,bg = "#70adda", width = "73", font="Cambria 14")
+        self.Brute_PW_Found.place(x=30, y=420)
 
         self.root.mainloop()
 
-    def bruteForceAttack(self):
-        pass
-
-    def inputValidationMin(self,*args):
+    def inputValidationMin(self, *args):
         try:
             a = str(self.minInput.get())
             int(self.minInput.get())
@@ -87,7 +99,7 @@ class Password_Cracker:
             if a != "":
                 self.minInput.set(a[:-1])
 
-    def inputValidationMax(self,*args):
+    def inputValidationMax(self, *args):
         try:
             a = str(self.maxInput.get())
             int(self.maxInput.get())
@@ -96,6 +108,80 @@ class Password_Cracker:
             if a != "":
                 self.maxInput.set(a[:-1])
 
+    def validation_algo(self):
+        self.Result_Progress_Text.delete('1.0', END)
+        self.validationList = [str(self.hashInput.get()), str(self.minInput.get()), str(self.maxInput.get()),
+                               str(self.Charset.get()), str(self.comboBox.get())]
+        if "" in self.validationList or " " in self.validationList:
+            self.Result_Progress_Text.insert("1.0", "All Fields are Mandatory and Can't be left Empty !\n")
+        else:
+            if self.validationList[4] == "Md5":
+                if len(self.validationList[0]) != 32:
+                    self.Result_Progress_Text.insert("1.0", "Invalid Hash was Given: Md5 doesn't Match\n")
+                else:
+                    self.Process_BruteForce()
+
+            elif self.validationList[4] == "Sha1":
+                if len(self.validationList[0]) != 40:
+                    self.Result_Progress_Text.insert("1.0", "Invalid Hash was Given: Sha1 doesn't Match\n")
+                else:
+                    self.Process_BruteForce()
+            elif self.validationList[5] == "Sha2":
+                if len(self.validationList[0]) != 40:
+                    self.Result_Progress_Text.insert("1.0", "Invalid Hash was Given: Sha2 doesn't Match\n")
+                else:
+                    self.Process_BruteForce()
+
+    def Process_BruteForce(self):
+        self.Brute_PW_Found.place_forget()
+
+        hash_to_crack = self.validationList[0]
+        min = self.validationList[1]
+        max = self.validationList[2]
+        charset = self.validationList[3]
+        hashtype = self.validationList[4]
+        flag = False
+        for i in range(int(min), int(max) + 1):
+            if flag:
+                break
+            # Generating Combinations of Length i
+            combinations = itertools.product(charset, repeat=i)
+            for i in combinations:
+                if hashtype == "Md5":
+                    if hashlib.md5("".join(i).encode()).hexdigest() == hash_to_crack:
+                        self.Result_Progress_Text.insert('1.0',f"Password Found: {''.join(i)}\n")
+                        self.Brute_PW_Found.config(bg= "#f0ea3a",text = f"Password Hash Successfully Cracked : {''.join(i)}")
+                        self.Brute_PW_Found.place(x=30, y=420)
+
+                        flag = True
+                        break
+                    else:
+                        self.Result_Progress_Text.insert('1.0',f"Trying Password : {''.join(i)}\n")
+
+                elif hashtype == "Sha1":
+                    if hashlib.sha1("".join(i).encode()).hexdigest() == hash_to_crack:
+                        self.Result_Progress_Text.insert('1.0',f"Password Found {''.join(i)}\n")
+                        self.Brute_PW_Found.config(text = f"Password Hash Successfully Cracked : {''.join(i)}",bg= "#f0ea3a")
+                        self.Brute_PW_Found.place(x=30, y=420)
+                        flag = True
+                        break
+                    else:
+                        self.Result_Progress_Text.insert('1.0',f"Trying Password : {''.join(i)}\n")
+
+                elif hashtype == "Sha2":
+                    if hashlib.md5("".join(i).encode()).hexdigest() == hash_to_crack:
+                        self.Result_Progress_Text.insert('1.0',f"Password Found: {''.join(i)}\n")
+                        self.Brute_PW_Found.config(text = f"Password Hash Successfully Cracked : {''.join(i)}",bg= "#f0ea3a")
+                        self.Brute_PW_Found.place(x=30, y=420)
+
+                        flag = True
+                        break
+                    else:
+                        self.Result_Progress_Text.insert('1.0', f"Trying Password : {''.join(i)}\n")
+        if not flag:
+            self.Result_Progress_Text.insert('1.0', f'Password not Found , Trying Changing the charset or length\n')
+
+    # Other Hash Algorithms can be added easily as above.
+
 
 Password_Cracker()
-
