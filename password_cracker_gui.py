@@ -139,8 +139,8 @@ class Password_Cracker:
                                      command=self.validation_algo1)
         self.buttonDict.place(x=330, y=120)
 
-        self.Result_Progress_Text1 = Text(self.Dictionary, width=92, height=12, bg="white")
-        self.Result_Progress_Text1.place(x=30, y=220)
+        self.Result_Progress_Text1 = Text(self.Dictionary, width=92, height=16, bg="white")
+        self.Result_Progress_Text1.place(x=30, y=160)
 
         self.Dict_PW_Found = Label(self.Dictionary, bg="#70adda", width="73", font="Cambria 14")
         self.Dict_PW_Found.place(x=30, y=420)
